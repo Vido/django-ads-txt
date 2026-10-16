@@ -8,3 +8,9 @@ from .models import Rule
 @register(Rule)
 class RuleAdmin(SuperModelAdmin):
     list_display = ['domain', 'account_id', 'account_type', 'authority_id']
+    base_change_list_template = SuperModelAdmin.change_list_template or 'admin/change_list.html'
+    change_list_template = 'ads_txt/admin/ads_txt/adstxt/change_list.html'
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = dict(extra_context or {}, base_change_list_template=self.base_change_list_template)
+        return super().changelist_view(request, extra_context)

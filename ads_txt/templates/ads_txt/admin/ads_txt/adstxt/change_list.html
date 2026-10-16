@@ -1,4 +1,4 @@
-{% extends "admin/change_list.html" %}
+{% extends base_change_list_template|default:"admin/change_list.html" %}
 
 {% block object-tools-items %}
     {{ block.super }}
