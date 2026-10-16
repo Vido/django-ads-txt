@@ -9,9 +9,9 @@ This is a basic Django application to manage Authorized Digital Sellers (ads.txt
 
 
 ### Requirements
-Python 2.7, 3.5 or PyPy.
+Python 3.8 or higher.
 
-Django 1.9 or higher.
+Django 2.2, 3.x or 4.x.
 
 ## Installation
 
