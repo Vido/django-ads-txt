@@ -39,6 +39,7 @@ class BaseRule(models.Model):
 
 class Rule(BaseRule):
 
+    filename = 'ads.txt'
     sites = models.ManyToManyField(Site, verbose_name=_('sites'), related_name='adstxt')
 
     class Meta:
@@ -47,6 +48,8 @@ class Rule(BaseRule):
 
 
 class AppRule(BaseRule):
+
+    filename = 'app-ads.txt'
 
     class Meta:
         verbose_name = _('app rule')

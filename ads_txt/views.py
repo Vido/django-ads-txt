@@ -24,22 +24,19 @@ class RuleList(ListView):
         cache_decorator = cache_page(cache_timeout)
         return cache_decorator(super_dispatch)(request, *args, **kwargs)
 
-
-class AppRuleList(RuleList):
-    model = AppRule
-
 from django import forms
 from django.contrib import messages
-from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
-from django.utils.decorators import method_decorator
-from django.contrib.admin.views.decorators import staff_member_required
 
 
 class BulkRulesForm(forms.Form):
 
     ads_rules = forms.CharField(widget=forms.Textarea)
+
+    def __init__(self, *args, model=Rule, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model = model
 
     def clean(self):
         cleaned_data = super().clean()
@@ -52,7 +49,7 @@ class BulkRulesForm(forms.Form):
             if not rule.strip():
                 continue
 
-            match = Rule.validate(rule.strip())
+            match = self.model.validate(rule.strip())
             if not match:
                 errors.append(str(index))
                 continue
@@ -65,16 +62,16 @@ class BulkRulesForm(forms.Form):
         cleaned_data['ads_rules'] = matches
         return cleaned_data
 
-@method_decorator(staff_member_required, name='dispatch')
 class UploadRulesFormView(FormView):
     template_name = "ads_txt/change_form.html"
     form_class = BulkRulesForm
-    success_url = reverse_lazy('admin:index')
     model = Rule
-    filename = 'ads.txt'
+
+    def get_form_kwargs(self):
+        return dict(super().get_form_kwargs(), model=self.model)
 
     def get_context_data(self, **kwargs):
-        kwargs.setdefault('filename', self.filename)
+        kwargs.setdefault('filename', self.model.filename)
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -86,19 +83,12 @@ class UploadRulesFormView(FormView):
                 self.model.objects.filter(**ads_dict).delete()
                 self.model.objects.get_or_create(**ads_dict)
 
-        messages.add_message(self.request, messages.SUCCESS, _('%s rules updated with success') % self.filename)
+        messages.add_message(self.request, messages.SUCCESS, _('%s rules updated with success') % self.model.filename)
         return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form):
-        messages.add_message(self.request, messages.ERROR, _('Failed to update %s') % self.filename)
+        messages.add_message(self.request, messages.ERROR, _('Failed to update %s') % self.model.filename)
         return self.render_to_response(self.get_context_data(form=form))
 
-
-class UploadAppRulesFormView(UploadRulesFormView):
-    model = AppRule
-    filename = 'app-ads.txt'
-
 rules_list = RuleList.as_view()
-app_rules_list = AppRuleList.as_view()
-bulk_upload_rules = UploadRulesFormView.as_view()
-bulk_upload_app_rules = UploadAppRulesFormView.as_view()
+app_rules_list = RuleList.as_view(model=AppRule)

@@ -65,7 +65,7 @@ ex.com, 7118, RESELLER
 
 ### app-ads.txt
 
-Rules for mobile apps ([IAB app-ads.txt spec](https://iabtechlab.com/ads-txt/)) are managed separately in the `App rules` admin and served at `/app-ads.txt`. They are stored in their own table and never mix with `/ads.txt`. Bulk upload is available at `/ads_txt/app/upload`.
+Rules for mobile apps ([IAB app-ads.txt spec](https://iabtechlab.com/ads-txt/)) are managed separately in the `App rules` admin and served at `/app-ads.txt`. They are stored in their own table and never mix with `/ads.txt`. Each admin has its own Bulk Upload button.
 
 ### Caching
 

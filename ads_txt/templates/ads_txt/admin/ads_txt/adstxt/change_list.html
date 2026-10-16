@@ -1,9 +1,10 @@
-{% extends base_change_list_template|default:"admin/change_list.html" %}
+{% extends base_change_list_template %}
+{% load admin_urls %}
 
 {% block object-tools-items %}
     {{ block.super }}
     <li>
-        <a href="{% url bulk_upload_url_name|default:'ads_txt_bulk_upload' %}" class="addlink">
+        <a href="{% url opts|admin_urlname:'bulk_upload' %}" class="addlink">
             Bulk Upload
         </a>
     </li>
