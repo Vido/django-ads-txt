@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 @python_2_unicode_compatible
-class Rule(models.Model):
+class BaseRule(models.Model):
 
     DIRECT = 'DIRECT'
     RESELLER = 'RESELLER'
@@ -21,11 +21,8 @@ class Rule(models.Model):
     account_type = models.CharField(_('Account Type'), max_length=100, choices=ACCOUNT_TYPE_CHOICES,)
     authority_id = models.CharField(_('Authority ID'), max_length=255, blank=True, null=True)
 
-    sites = models.ManyToManyField(Site, verbose_name=_('sites'), related_name='adstxt')
-
     class Meta:
-        verbose_name = _('rule')
-        verbose_name_plural = _('rules')
+        abstract = True
 
     def __str__(self):
         return self.domain
@@ -40,3 +37,19 @@ class Rule(models.Model):
         # 3.4.1 Comments, 3.5 Variables, 4.4 Contact Records, 4.5 Subdomain Referral, etc ...
         pattern = r'(?P<domain>.+),\s*(?P<account_id>.+),\s*(?P<account_type>RESELLER|DIRECT)(,\s*(?P<authority_id>.+))?'
         return re.search(pattern, line)
+
+
+class Rule(BaseRule):
+
+    sites = models.ManyToManyField(Site, verbose_name=_('sites'), related_name='adstxt')
+
+    class Meta:
+        verbose_name = _('rule')
+        verbose_name_plural = _('rules')
+
+
+class AppRule(BaseRule):
+
+    class Meta:
+        verbose_name = _('app rule')
+        verbose_name_plural = _('app rules')

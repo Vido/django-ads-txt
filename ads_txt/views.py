@@ -3,12 +3,13 @@ from django.views.generic import ListView
 from django.views.generic.edit import FormView
 
 from ads_txt import settings
-from ads_txt.models import Rule
+from ads_txt.models import Rule, AppRule
 
 
 class RuleList(ListView):
     model = Rule
     context_object_name = 'rules'
+    template_name = 'ads_txt/rule_list.html'
     cache_timeout = settings.CACHE_TIMEOUT
     content_type = 'text/plain'
 
@@ -22,6 +23,10 @@ class RuleList(ListView):
             return super_dispatch(request, *args, **kwargs)
         cache_decorator = cache_page(cache_timeout)
         return cache_decorator(super_dispatch)(request, *args, **kwargs)
+
+
+class AppRuleList(RuleList):
+    model = AppRule
 
 from django import forms
 from django.contrib import messages
@@ -65,22 +70,35 @@ class UploadRulesFormView(FormView):
     template_name = "ads_txt/change_form.html"
     form_class = BulkRulesForm
     success_url = reverse_lazy('admin:index')
+    model = Rule
+    filename = 'ads.txt'
+
+    def get_context_data(self, **kwargs):
+        kwargs.setdefault('filename', self.filename)
+        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         ads_list = form.cleaned_data.get('ads_rules')
         for ads_dict in ads_list:
             try:
-                Rule.objects.get_or_create(**ads_dict)
-            except Rule.MultipleObjectsReturned:
-                Rule.objects.filter(**ads_dict).delete()
-                Rule.objects.get_or_create(**ads_dict)
+                self.model.objects.get_or_create(**ads_dict)
+            except self.model.MultipleObjectsReturned:
+                self.model.objects.filter(**ads_dict).delete()
+                self.model.objects.get_or_create(**ads_dict)
 
-        messages.add_message(self.request, messages.SUCCESS, _('ads.txt rules updated with success'))
+        messages.add_message(self.request, messages.SUCCESS, _('%s rules updated with success') % self.filename)
         return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form):
-        messages.add_message(self.request, messages.ERROR, _('Failed to update ads.txt'))
+        messages.add_message(self.request, messages.ERROR, _('Failed to update %s') % self.filename)
         return self.render_to_response(self.get_context_data(form=form))
 
+
+class UploadAppRulesFormView(UploadRulesFormView):
+    model = AppRule
+    filename = 'app-ads.txt'
+
 rules_list = RuleList.as_view()
+app_rules_list = AppRuleList.as_view()
 bulk_upload_rules = UploadRulesFormView.as_view()
+bulk_upload_app_rules = UploadAppRulesFormView.as_view()

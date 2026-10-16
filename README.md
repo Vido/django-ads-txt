@@ -63,6 +63,10 @@ opexample.com, [537120668 - CC], RESELLER, 6a69ec356744c6
 ex.com, 7118, RESELLER
 ```
 
+### app-ads.txt
+
+Rules for mobile apps ([IAB app-ads.txt spec](https://iabtechlab.com/ads-txt/)) are managed separately in the `App rules` admin and served at `/app-ads.txt`. They are stored in their own table and never mix with `/ads.txt`. Bulk upload is available at `/ads_txt/app/upload`.
+
 ### Caching
 
 You can optionally cache the generation of the ads.txt. Add or change the ADSTXT_CACHE_TIMEOUT setting with a value in seconds in your Django settings file:
