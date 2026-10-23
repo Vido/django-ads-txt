@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-ads-txt',
-    version='1.3.0',
+    version='1.3.1',
     packages=find_namespace_packages(include=['ads_txt', 'ads_txt.*']),
     python_requires='>=3.8',
     install_requires=['Django>=2.2'],
