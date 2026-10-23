@@ -1,5 +1,5 @@
 import os
-from setuptools import find_packages, setup
+from setuptools import find_namespace_packages, setup
 
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
     README = readme.read()
@@ -10,11 +10,11 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 setup(
     name='django-ads-txt',
     version='1.3.0',
-    packages=find_packages(),
+    packages=find_namespace_packages(include=['ads_txt', 'ads_txt.*']),
     python_requires='>=3.8',
     install_requires=['Django>=2.2'],
     include_package_data=True,
-    license='MIT License',
+    license_expression='MIT',
     description='A simple Django app to manage ads.txt file from admin panel',
     long_description=README,
     long_description_content_type='text/markdown',
@@ -32,7 +32,6 @@ setup(
         'Framework :: Django :: 4.1',
         'Framework :: Django :: 4.2',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
